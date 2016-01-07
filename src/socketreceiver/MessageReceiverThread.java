@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import socketreceiver.ClientRequestListener.ClientRequestChangesListener;
 
 /**
  *
@@ -20,9 +21,12 @@ import java.util.logging.Logger;
  */
 public class MessageReceiverThread implements Runnable{
     private final Socket socket;
+    private final ClientRequestChangesListener clientRequestChangesListener;
+    private String alias;
     
-    public MessageReceiverThread(Socket socket){
+    public MessageReceiverThread(Socket socket, ClientRequestChangesListener clientRequestChangesListener){
         this.socket = socket;
+        this.clientRequestChangesListener = clientRequestChangesListener;
     }
     
     @Override
@@ -35,7 +39,12 @@ public class MessageReceiverThread implements Runnable{
             new PrintStream(outputStream).println("HOLA!");
             
             while((message = in.readLine())!=null){
-                System.out.println(message);
+                if(alias == null){
+                    alias = message;
+                    clientRequestChangesListener.hasMessage(">>"+alias+" : Hi im "+message+"!");   
+                }else{
+                    clientRequestChangesListener.hasMessage(">>"+alias+" : "+message);
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(MessageReceiverThread.class.getName()).log(Level.SEVERE, null, ex);

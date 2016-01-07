@@ -54,9 +54,9 @@ public class ClientRequestListener implements Runnable{
                 //Blocks loop until a connection is established
                 clientSocket = serverSocket.accept();
                 clientRequestChangesListener.hasConnected(clientSocket.getRemoteSocketAddress().toString());
-                MessageReceiverThread messageReceiverThread = new MessageReceiverThread(clientSocket);
+                MessageReceiverThread messageReceiverThread = new MessageReceiverThread(clientSocket, clientRequestChangesListener);
                 messageReceiverThreads.add(messageReceiverThread);
-                new Thread().start();
+                new Thread(messageReceiverThread).start();
             } catch (IOException ex) {
                 Logger.getLogger(ClientRequestListener.class.getName()).log(Level.SEVERE, null, ex);
             }
